@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Catálogo - Gabriel Store</title>
+<style>
+body{font-family:Arial,sans-serif;background:#f5f5f5;margin:0;padding:15px}
+h1{text-align:center}
+.sub{text-align:center;color:#555;margin-top:-10px;margin-bottom:15px}
+.card{background:#fff;border-radius:12px;padding:12px;margin-bottom:12px;display:flex;justify-content:space-between;align-items:center;box-shadow:0 2px 5px #00000015}
+.info b{display:block}
+.preco{color:#25D366;font-weight:bold}
+.qtd{display:flex;align-items:center;gap:8px}
+.qtd button{width:32px;height:32px;border-radius:50%;border:none;background:#25D366;color:#fff;font-size:18px}
+.qtd span{font-weight:bold;font-size:16px;min-width:20px;text-align:center}
+#total{position:fixed;bottom:0;left:0;right:0;background:#fff;padding:15px;text-align:center;box-shadow:0 -2px 10px #00000020}
+#total b{font-size:20px}
+#enviar{background:#25D366;color:#fff;border:none;padding:12px 20px;border-radius:10px;font-size:16px;font-weight:bold;width:100%;margin-top:10px}
+</style>
+</head>
+<body>
+
+<h1>🍫🍬 Gabriel Store</h1>
+<p class="sub">Doces Disponíveis Hoje - Santarém PA</p>
+
+<div id="lista"></div>
+<div style="height:130px"></div>
+
+<div id="total">
+Total: <b id="valorTotal">R$ 0,00</b>
+<button id="enviar" onclick="enviar()">📲 Enviar Pedido no WhatsApp</button>
+</div>
+
+<script>
+const produtos = [
+{nome:"Amendoim Crocante Cebola e Salsa 70g", preco:5},
+{nome:"KitKat Chocolate ao Leite 41,5g", preco:5},
+{nome:"Fini Tubes Morango Cítrico 80g", preco:6},
+{nome:"Fini Tubes Morango 80g", preco:6},
+{nome:"Fini Tubes Uva Azedinho 80g", preco:6},
+{nome:"Fini Tubes Uva Cítrico Azidinho 80g", preco:6},
+{nome:"KitKat Chocolate Branco 41,5g", preco:5},
+{nome:"Barra Garoto ao Leite 80g", preco:8},
+{nome:"Barra Garoto Branco Cremoso 80g", preco:8},
+{nome:"Barra Garoto Branco com Negresco 80g", preco:8},
+];
+
+let qtd = Array(produtos.length).fill(0);
+const lista = document.getElementById('lista');
+
+produtos.forEach((p,i)=>{
+lista.innerHTML += `
+<div class="card">
+<div class="info"><b>${p.nome}</b><span class="preco">R$ ${p.preco.toFixed(2).replace('.',',')}</span></div>
+<div class="qtd">
+<button onclick="mudar(${i},-1)">-</button>
+<span id="q${i}">0</span>
+<button onclick="mudar(${i},1)">+</button>
+</div>
+</div>`;
+});
+
+function mudar(i, v){
+qtd[i] = Math.max(0, qtd[i]+v);
+document.getElementById('q'+i).innerText = qtd[i];
+atualizar();
+}
+function atualizar(){
+let total = 0;
+produtos.forEach((p,i)=> total += p.preco * qtd[i]);
+document.getElementById('valorTotal').innerText = 'R$ ' + total.toFixed(2).replace('.',',');
+}
+function enviar(){
+let msg = 'Olá Gabriel Store! Quero fazer um pedido:%0A%0A';
+let temPedido = false;
+produtos.forEach((p,i)=>{
+if(qtd[i]>0){
+msg += `- ${qtd[i]}x ${p.nome} - R$ ${(p.preco*qtd[i]).toFixed(2).replace('.',',')}%0A`;
+temPedido = true;
+}
+});
+if(!temPedido){ alert('Selecione pelo menos 1 produto!'); return; }
+let total = produtos.reduce((s,p,i)=> s + p.preco*qtd[i],0);
+msg += `%0ATotal: R$ ${total.toFixed(2).replace('.',',')}`;
+let meuNumero = '5593992303577';
+window.open(`https://wa.me/${meuNumero}?text=${msg}`, '_blank');
+}
+</script>
+</body>
+</html>
